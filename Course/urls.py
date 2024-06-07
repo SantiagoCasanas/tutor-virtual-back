@@ -8,5 +8,7 @@ urlpatterns = [
     path('instructor/delete/<int:pk>', DeleteCourseView.as_view(), name='instructor_delete'),
 
     path('student/<int:pk>/chat', Chat.as_view(), name='chat'),
-    path('student/list', List.as_view(), name='student_list')
+    path('student/list', List.as_view(), name='student_list'),
+    path('student/course/favorites/add', AddCourseFavoriteView.as_view(), name='student_courses_favorites_add'),
+    path('student/course/favorites/delete', DeleteFavoriteCourseView.as_view(), name='student_courses_favorites_delete'),
 ]

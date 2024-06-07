@@ -21,7 +21,7 @@ class Course(models.Model):
     Model representing a course.
     """
     name = models.CharField(max_length=100, verbose_name="Title for your course")
-    instructor = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null= False)
+    instructor = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False)
     description = models.CharField(max_length=200, verbose_name="Write a quick description of your course")
     context = models.TextField(
         verbose_name="Write the topics, context, and a large description for your course",
@@ -79,3 +79,47 @@ class Course(models.Model):
             course = Course.objects.create(name=name, description=description, context=context)
             return course
         return None
+
+
+class FavoriteCourse(models.Model):
+    """
+    Model representing a favorite course of a student.
+    """
+    student = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, blank=False, null=False)
+    active = models.BooleanField(default=True, null=False)
+
+    @staticmethod
+    def create(student: User, course: Course, active=True):
+        """
+        Create a new FavoriteCourse entry or reactivate an existing one.
+
+        Args:
+            student (User): The student marking the course as favorite.
+            course (Course): The course being marked as favorite.
+            active (bool): The status of the favorite course entry.
+
+        Returns:
+            FavoriteCourse: The created or reactivated FavoriteCourse instance.
+        """
+        if not FavoriteCourse.exists(student=student, course=course):
+            return FavoriteCourse.objects.create(student=student, course=course, active=active)
+        else:
+            favorite_course = FavoriteCourse.objects.filter(student=student, course=course).first()
+            favorite_course.active = True
+            favorite_course.save()
+            return favorite_course
+
+    @staticmethod
+    def exists(student: User, course: Course):
+        """
+        Check if a FavoriteCourse entry exists for a given student and course.
+
+        Args:
+            student (User): The student to check.
+            course (Course): The course to check.
+
+        Returns:
+            bool: True if the entry exists, False otherwise.
+        """
+        return FavoriteCourse.objects.filter(student=student, course=course).exists()

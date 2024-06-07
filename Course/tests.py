@@ -1,9 +1,9 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 from Users.models import User
 from .models import Course
-
 
 class CourseAPITestCase(APITestCase):
 
@@ -30,25 +30,29 @@ class CourseAPITestCase(APITestCase):
             context='Test context'
         )
 
+    def authenticate_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+
     def test_list_courses(self):
-        self.client.login(username='student@gmail.com', password='password')
+        self.authenticate_user(self.student_user)
         url = reverse('student_list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+
     def test_list_own_courses(self):
-        self.client.login(username='instructor@gmail.com', password='password')
+        self.authenticate_user(self.instructor_user)
         url = reverse('instructor_list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_create_course(self):
-        self.client.login(username='instructor@gmail.com', password='password')
+        self.authenticate_user(self.instructor_user)
         url = reverse('instructor_register')
         data = {
             'name': 'New Course',
-            'instructor': self.instructor_user.id,
+            'instructor': self.instructor_user.id,  # Cambiado a self.instructor_user.id
             'description': 'A new course description',
             'context': 'New context'
         }
@@ -56,7 +60,7 @@ class CourseAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_course(self):
-        self.client.login(username='instructor@gmail.com', password='password')
+        self.authenticate_user(self.instructor_user)
         url = reverse('instructor_modify', args=[self.course.pk])
         data = {
             'name': 'Updated Course',
@@ -68,7 +72,7 @@ class CourseAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_chat_with_model(self):
-        self.client.login(username='student@gmail.com', password='password')
+        self.authenticate_user(self.student_user)
         url = reverse('chat', args=[self.course.pk])
         data = {
             'content': 'What is the context?'
