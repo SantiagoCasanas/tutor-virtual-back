@@ -56,6 +56,7 @@ class DeleteCourseView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         """
         Change the activation status of a Course object and return the serialized response.
+        If the course is deactivated, also disappears from favorite courses
         """
         instance = self.get_object()
         new_value = instance.active
@@ -99,7 +100,7 @@ class ListFavoriteCourseView(generics.ListAPIView):
         Customize queryset for retrieve only active and favorite courses of the authenticated user
         """
         user = self.request.user
-        return FavoriteCourse.objects.filter(student=user, active=True)
+        return FavoriteCourse.objects.filter(student=user,course__active=True,active=True)
     
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ListFavoriteCourseSerializer
