@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import dj_database_url
+from decouple import config
 
 from pathlib import Path
 
@@ -109,7 +111,7 @@ DATABASES = {
 
     #comment this line if you run the api locally 
 
-    #'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    #'default': dj_database_url.parse(config("DATABASE_URL"))
 }
 
 # Password validation

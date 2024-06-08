@@ -188,3 +188,13 @@ class DeleteFavoriteCourseSerializer(BaseFavoriteCourseSerializer):
             return favorite_course
         except FavoriteCourse.DoesNotExist:
             raise serializers.ValidationError('FavoriteCourse does not exist.')
+
+
+class ListFavoriteCourseSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source = 'course.name', read_only=True)
+    instructor = serializers.CharField(source = 'course.instructor', read_only=True)
+    description = serializers.CharField(source = 'course.description', read_only=True)
+
+    class Meta:
+        model = FavoriteCourse
+        fields = ["student","course","name","instructor", "description", "active"]

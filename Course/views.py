@@ -3,9 +3,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Course
+from .models import Course, FavoriteCourse
 from .permissions import IsCoursePermission, IsYourOwnIdInstructor, IsYourOwnIdStudent
-from .serializers import AddFavoriteCourseSerializer, CourseCreateSerializer, CourseListSerializer, CourseUpdateSerializer, DeleteFavoriteCourseSerializer, QuestionSerializer
+from .serializers import AddFavoriteCourseSerializer, CourseCreateSerializer, CourseListSerializer, CourseUpdateSerializer, DeleteFavoriteCourseSerializer, QuestionSerializer, ListFavoriteCourseSerializer
 
 
 class List(generics.ListAPIView):
@@ -89,6 +89,14 @@ class DeleteFavoriteCourseView(generics.GenericAPIView):
             return Response({'status': 'Favorite course deactivated'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class ListFavoriteCourseView(generics.ListAPIView):
+    def get_queryset(self):
+        user = self.request.user
+        return FavoriteCourse.objects.filter(student=user, active=True)
+    
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ListFavoriteCourseSerializer
 
 class Chat(APIView):
     """

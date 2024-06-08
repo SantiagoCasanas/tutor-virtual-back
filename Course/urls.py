@@ -11,4 +11,5 @@ urlpatterns = [
     path('student/list', List.as_view(), name='student_list'),
     path('student/course/favorites/add', AddCourseFavoriteView.as_view(), name='student_courses_favorites_add'),
     path('student/course/favorites/delete', DeleteFavoriteCourseView.as_view(), name='student_courses_favorites_delete'),
+    path('student/course/favorites/list', ListFavoriteCourseView.as_view(), name='student_courses_favorites_list'),
 ]
