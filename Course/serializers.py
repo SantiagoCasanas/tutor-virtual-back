@@ -189,7 +189,6 @@ class DeleteFavoriteCourseSerializer(BaseFavoriteCourseSerializer):
         except FavoriteCourse.DoesNotExist:
             raise serializers.ValidationError('FavoriteCourse does not exist.')
 
-
 class ListFavoriteCourseSerializer(serializers.ModelSerializer):
     """
     Serializer for retrieve all favorite courses of a student.
