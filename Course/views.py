@@ -91,7 +91,13 @@ class DeleteFavoriteCourseView(generics.GenericAPIView):
 
 
 class ListFavoriteCourseView(generics.ListAPIView):
+    """
+    List favorite courses of student
+    """
     def get_queryset(self):
+        """
+        Customize queryset for retrieve only active and favorite courses of the authenticated user
+        """
         user = self.request.user
         return FavoriteCourse.objects.filter(student=user, active=True)
     

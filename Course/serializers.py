@@ -191,10 +191,17 @@ class DeleteFavoriteCourseSerializer(BaseFavoriteCourseSerializer):
 
 
 class ListFavoriteCourseSerializer(serializers.ModelSerializer):
+    """
+    Serializer for retrieve all favorite courses of a student.
+
+    getting name, instructor, description, context and creation date of a course based on the id in the favorite course table.
+    """
     name = serializers.CharField(source = 'course.name', read_only=True)
     instructor = serializers.CharField(source = 'course.instructor', read_only=True)
     description = serializers.CharField(source = 'course.description', read_only=True)
+    context = serializers.CharField(source = 'course.context', read_only=True)
+    creation_date = serializers.DateTimeField(source='course.creation_date', read_only=True)
 
     class Meta:
         model = FavoriteCourse
-        fields = ["student","course","name","instructor", "description", "active"]
+        fields = ["student","course","name","instructor", "description", "context", "creation_date","active"]
