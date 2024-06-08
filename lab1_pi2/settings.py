@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 import dj_database_url
-from decouple import config
 
 from pathlib import Path
 
@@ -108,10 +107,6 @@ DATABASES = {
        'HOST': os.getenv('DB_CONTAINER_NAME', 'localhost'),
        'PORT': os.getenv('DB_PORT','5432'),
     }
-
-    #comment this line if you run the api locally 
-
-    #'default': dj_database_url.parse(config("DATABASE_URL"))
 }
 
 # Password validation
