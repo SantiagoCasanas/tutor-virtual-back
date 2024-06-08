@@ -3,9 +3,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Course
-from .permissions import IsCoursePermission, IsYourOwnId
-from .serializers import CourseCreateSerializer, CourseListSerializer, CourseUpdateSerializer, QuestionSerializer
+from .models import Course, FavoriteCourse
+from .permissions import IsCoursePermission, IsYourOwnIdInstructor, IsYourOwnIdStudent
+from .serializers import AddFavoriteCourseSerializer, CourseCreateSerializer, CourseListSerializer, CourseUpdateSerializer, DeleteFavoriteCourseSerializer, QuestionSerializer, ListFavoriteCourseSerializer
 
 
 class List(generics.ListAPIView):
@@ -33,7 +33,7 @@ class Create(generics.CreateAPIView):
     """
     Create a new course. (for instructors)
     """
-    permission_classes = [permissions.IsAuthenticated, IsYourOwnId]
+    permission_classes = [permissions.IsAuthenticated, IsYourOwnIdInstructor]
     serializer_class = CourseCreateSerializer
 
 
@@ -48,7 +48,7 @@ class Modify(generics.UpdateAPIView):
 
 
 class DeleteCourseView(generics.GenericAPIView):
-    queryset = Course.objects.filter(active= True)
+    queryset = Course.objects.filter(active=True)
     permission_classes = [permissions.IsAuthenticated, IsCoursePermission]
     lookup_field = 'pk'
     serializer_class = CourseCreateSerializer
@@ -64,6 +64,39 @@ class DeleteCourseView(generics.GenericAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class AddCourseFavoriteView(generics.CreateAPIView):
+    """
+    Add course to favorites. (for students)
+    """
+    permission_classes = [permissions.IsAuthenticated, IsYourOwnIdStudent]
+    serializer_class = AddFavoriteCourseSerializer
+
+
+class DeleteFavoriteCourseView(generics.GenericAPIView):
+    """
+    Delete course from favorites. (for students)
+    """
+    permission_classes = [permissions.IsAuthenticated, IsYourOwnIdStudent]
+    serializer_class = DeleteFavoriteCourseSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            student = serializer.validated_data['student']
+            course = serializer.validated_data['course']
+            serializer.deactivate_favorite_course(student, course)
+            return Response({'status': 'Favorite course deactivated'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListFavoriteCourseView(generics.ListAPIView):
+    def get_queryset(self):
+        user = self.request.user
+        return FavoriteCourse.objects.filter(student=user, active=True)
+    
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ListFavoriteCourseSerializer
 
 class Chat(APIView):
     """
