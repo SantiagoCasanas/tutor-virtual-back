@@ -1,6 +1,8 @@
 import json
 
-import openai
+import google.generativeai as genai
+import markdown
+
 
 def validate_context(value):
     """
@@ -25,15 +27,11 @@ def get_secret_key():
     """
     with open('secrets.json') as f:
         secrets = json.load(f)
-    return secrets.get('OPENAI_KEY')
+    return secrets.get('api_key')
 
 
-api_key = get_secret_key()
-if api_key:
-    openai.api_key = api_key
 
-
-def ask_open_ai(context, question, model="gpt-3.5-turbo-16k"):
+def ask_google_ai(context, question, model="gpt-3.5-turbo-16k"):
     """
     Ask a question to the OpenAI model.
 
@@ -51,16 +49,15 @@ If the answer is not related to the context,
 give the following answer: "The question is not related to the course". 
 Provide your answer using the language used in the question.'''
 
-    chat_messages = [{"role": "user", "content": prompt}]
     try:
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=chat_messages,
-            temperature=0,
-            max_tokens=300,
-            n=1
-        )
-        answer = response.choices[0].message if response and response.choices else None
+        api_key = get_secret_key()
+        if api_key:
+            genai.configure(api_key = api_key)
+            model = genai.GenerativeModel('gemini-pro')
+        
+        response = model.generate_content(prompt)
+        response = response.text
+        answer = markdown.markdown(response)
     except Exception as e:
         print(e)
         answer = None

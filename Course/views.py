@@ -1,7 +1,6 @@
-from Course.utils import ask_open_ai, validate_context
+from Course.utils import ask_google_ai, validate_context
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .models import Course, FavoriteCourse
 from .permissions import IsCoursePermission, IsYourOwnIdInstructor, IsYourOwnIdStudent
@@ -129,7 +128,7 @@ class Chat(generics.GenericAPIView):
             question = serializer.validated_data.get('content')
             if validate_context(question):
                 context = Course.get_context(pk)
-                answer = ask_open_ai(context, question)
+                answer = ask_google_ai(context, question)
                 return Response({'answer': answer})
             else:
                 return Response({'error': 'Invalid question'}, status=status.HTTP_400_BAD_REQUEST)

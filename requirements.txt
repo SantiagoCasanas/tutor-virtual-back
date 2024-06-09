@@ -9,4 +9,5 @@ gunicorn
 djangorestframework-simplejwt
 drf-yasg
 setuptools
-generativeai
+google-generativeai
+markdown
