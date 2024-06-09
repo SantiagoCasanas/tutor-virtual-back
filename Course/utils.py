@@ -62,6 +62,7 @@ Provide your answer using the language used in the question.'''
         )
         answer = response.choices[0].message if response and response.choices else None
     except Exception as e:
+        print(e)
         answer = None
         # Handle exceptions, such as logging errors or returning an error response to the user
     return answer if answer else "No response"

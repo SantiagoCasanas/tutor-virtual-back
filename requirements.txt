@@ -9,3 +9,4 @@ gunicorn
 djangorestframework-simplejwt
 drf-yasg
 setuptools
+generativeai

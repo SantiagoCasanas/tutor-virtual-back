@@ -104,11 +104,12 @@ class ListFavoriteCourseView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ListFavoriteCourseSerializer
 
-class Chat(APIView):
+
+class Chat(generics.GenericAPIView):
     """
     Chat with the OpenAI model. (for students)
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     serializer_class = QuestionSerializer
 
     def post(self, request, pk):
