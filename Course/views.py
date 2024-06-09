@@ -109,7 +109,7 @@ class Chat(generics.GenericAPIView):
     """
     Chat with the OpenAI model. (for students)
     """
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = QuestionSerializer
 
     def post(self, request, pk):
