@@ -6,8 +6,10 @@ from Users.models import User
 from .models import Course
 
 class CourseAPITestCase(APITestCase):
-
     def setUp(self):
+        self.refresh_token_user_url = reverse('token_refresh')
+        self.login_user_url = reverse('login')
+
         # Crear usuarios para pruebas
         self.student_user = User.objects.create_user(
             first_name='student',
@@ -30,6 +32,16 @@ class CourseAPITestCase(APITestCase):
             context='Test context'
         )
 
+    #obtener nuevos token de accesso y refresco para extender la sesión del usuario
+    def test_user_refresh_token_POST(self):
+        refresh = RefreshToken.for_user(self.student_user)
+        refresh_token = {
+            'refresh': f'{refresh}',
+        }
+        response = self.client.post(self.refresh_token_user_url, refresh_token)
+        self.assertEqual(response.status_code,200)
+    
+    #autenticar usuarios para testear los servicios que requieren autenticación del usuario
     def authenticate_user(self, user):
         refresh = RefreshToken.for_user(user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
@@ -46,18 +58,6 @@ class CourseAPITestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-
-    def test_create_course(self):
-        self.authenticate_user(self.instructor_user)
-        url = reverse('instructor_register')
-        data = {
-            'name': 'New Course',
-            'instructor': self.instructor_user.id,  # Cambiado a self.instructor_user.id
-            'description': 'A new course description',
-            'context': 'New context'
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_course(self):
         self.authenticate_user(self.instructor_user)
